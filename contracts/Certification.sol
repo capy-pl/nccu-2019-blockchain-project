@@ -15,8 +15,9 @@ contract MemberCertification {
     struct Organization {
         string name;
         address ethAddress;
-        address[] admins;
         uint[] applications;
+        uint applicationCount;
+        mapping (address => bool) admins;
     }
 
     struct Certification {
@@ -25,7 +26,7 @@ contract MemberCertification {
         uint validFrom;
         uint validUntil;
         uint organization;
-        uint isCertified;   // -1, 1, 0 (reject, valid, pending)
+        int isCertified;   // -1, 1, 0 (reject, valid, pending)
         bool isPublic;
     }
 
@@ -63,7 +64,14 @@ contract MemberCertification {
         require(isExist == true, 'Organization does not exist.');
         _;
     }
-
+    
+    modifier isOrgAdmin(string memory orgName) {
+        Organization storage organization = organizations[searchOrgByName[orgName]];
+        bool isAdmin = organization.admins[msg.sender];
+        require(isAdmin == true, 'Address is not admin.');
+        _;
+    }
+    
     modifier memberAddressExist(address ethAddress) {
         bool isExist = memberAddressEnrolled[ethAddress];
         require(isExist == true, 'Address not exist.');
@@ -74,17 +82,17 @@ contract MemberCertification {
         owner = msg.sender;
     }
 
-    function addOrg(string memory name, address ethAddress)
+    function addOrg(string memory name, address ethAddress,  address defaultAdmin)
     public
     isOwner
     noDuplicateOrg(name) {
-        address[] memory admins;
         uint[] memory applications;
-        Organization memory org = Organization(name, ethAddress, admins, applications);
-        searchOrgByName[org.name] = organizations.length;
-        orgEnrolled[org.name] = true;
+        searchOrgByName[name] = organizations.length;
+        orgEnrolled[name] = true;
         orgList[ethAddress] = organizations.length;
-        organizations.push(org);
+        organizations.push(Organization(name, ethAddress, applications, 0));
+        Organization storage organization = getOrgByName(name);
+        organization.admins[defaultAdmin] = true;
     }
 
     function addMember(string memory name, string memory id, address ethAddress, address orgAddress, bool isPublic)
@@ -112,5 +120,48 @@ contract MemberCertification {
         member.certifications.push(certifications.length);
         certifications.push(certification);
     }
-
+    
+    function addAdmin(string memory orgName, address admin)
+    orgExist(orgName)
+    isOrgAdmin(orgName)
+    public
+    {
+        Organization storage organization = organizations[searchOrgByName[orgName]];
+        organization.admins[admin] = true;
+    }
+    
+    function getOrgByName(string memory orgName)
+    private
+    returns (Organization storage) {
+        return organizations[searchOrgByName[orgName]];
+    }
+    
+    function getOrgViewByName(string memory orgName)
+    private
+    view
+    returns (Organization memory) {
+        return organizations[searchOrgByName[orgName]];
+    }
+    
+    function getApplications(string memory orgName)
+    orgExist(orgName)
+    isOrgAdmin(orgName)
+    view
+    public
+    returns (uint[] memory)
+    {
+        Organization memory organization = getOrgViewByName(orgName);
+        Certification[] memory cerfts = certifications;
+        uint size = organization.applicationCount;
+        uint[]  memory filteredApplication = new uint[](size);
+        for (uint i = 0;i < organization.applications.length; i++) {
+            Certification memory application = certifications[organization.applications[i]];
+            if (application.isCertified == -1) {
+                filteredApplication[filteredApplication.length] = organization.applications[i];
+            }
+        }
+        return filteredApplication;
+    }
+    
+    // function getApplication(uint index)
 }
