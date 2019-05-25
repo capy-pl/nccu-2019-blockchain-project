@@ -42,31 +42,31 @@ contract MemberCertification {
     Certification[] public certifications;
 
     modifier isOwner() {
-        require(msg.sender == owner, 'Do not have proper permission.');
+        require(msg.sender == owner, 'Not have enough permission error.');
         _;
     }
 
     modifier noDuplicateOrg(string memory orgName) {
         bool hasDuplicate = orgEnrolled[orgName];
-        require(hasDuplicate == false, 'Has duplicate organization.');
+        require(hasDuplicate == false, 'Duplicate organization error.');
         _;
     }
 
     modifier noDuplicateMember(string memory id) {
         bool hasDuplicate = memberEnrolled[id];
-        require(hasDuplicate == false, 'Has duplicate member.');
+        require(hasDuplicate == false, 'Duplicate member error.');
         _;
     }
 
     modifier orgExist(string memory orgName) {
         bool isExist = orgEnrolled[orgName];
-        require(isExist == true, 'Organization does not exist.');
+        require(isExist == true, 'Cannot not found organization.');
         _;
     }
 
     modifier memberAddressExist(address ethAddress) {
         bool isExist = memberAddressEnrolled[ethAddress];
-        require(isExist == true, 'Address not exist.');
+        require(isExist == true, 'Cannot not found the member.');
         _;
     }
 
@@ -112,5 +112,4 @@ contract MemberCertification {
         member.certifications.push(certifications.length);
         certifications.push(certification);
     }
-
 }
