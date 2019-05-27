@@ -1,6 +1,6 @@
-const CertificationContract = artifacts.require("Certification");
+const MemberCertification = artifacts.require("MemberCertification");
 
 module.exports = function(deployer) {
   // deployment steps
-  deployer.deploy(CertificationContract);
+  deployer.deploy(MemberCertification);
 };
