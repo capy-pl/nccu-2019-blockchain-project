@@ -20,7 +20,7 @@ interface UserInfo {
   orgNameIfAdmin: string;
 }
 
-interface Certification {
+export interface Certification {
   title: string;
   value: string;
   validFrom: Date;
@@ -30,7 +30,7 @@ interface Certification {
   isPublic: boolean;
 }
 
-interface CertificationResponse extends Certification {
+export interface CertificationResponse extends Certification {
   applicationIndex: number;
   name: string;
   orgName: string;
@@ -72,8 +72,8 @@ export default class MemberCertificationContract {
     });
   }
 
-  public getOrgApplicationList(orgName: string): Promise<number[]> {
-    return this.contract.methods.getOrgApplicationList(orgName).call({
+  public getOrgApplicationIndexList(orgName: string): Promise<number[]> {
+    return this.contract.methods.getOrgApplicationIndexList(orgName).call({
       from: this.from
     });
   }
@@ -88,5 +88,9 @@ export default class MemberCertificationContract {
     return this.contract.methods.verifyApplication(orgName, applicationIndex).send({
       from: this.from
     });
+  }
+
+  public getApplications(indexList: number[]): Promise<CertificationResponse[]> {
+    return Promise.all(indexList.map(number => this.getApplication(number)));
   }
 }

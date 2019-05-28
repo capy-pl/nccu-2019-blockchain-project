@@ -184,7 +184,7 @@ contract MemberCertification {
         return (member.name, member.id, member.ethAddress, member.certifications, member.isPublic, adminAddressToOrg[msg.sender]);
     }
 
-    function getOrgApplicationList(string memory orgName)
+    function getOrgApplicationIndexList(string memory orgName)
     public
     orgExist(orgName)
     isOrgAdmin(orgName)
