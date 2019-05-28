@@ -1,14 +1,19 @@
 import Web3 from 'web3';
 import ContractABI from '../build/contracts/MemberCertification.json';
 import { Contract } from 'web3-eth-contract';
+import { EventEmitter } from 'events';
 
 const httpProvider = 'http://127.0.0.1:8545';
 const web3 = new Web3(httpProvider);
-const contractAddress = '0x1E492a11D20fe979BE16E71C16e657a3cB48A9d2';
+const contractAddress = '0x81F35D829107aA40Fc4ba62361db20D4c8d7382A';
 
 export function initContract(contractAddress: string, abi: any) {
   const { Contract } = web3.eth;
   return new Contract(abi, contractAddress);
+}
+
+interface BN {
+  toNumber: () => number;
 }
 
 interface UserInfo {
@@ -26,7 +31,7 @@ export interface Certification {
   validFrom: Date;
   validUntil: Date;
   organization: number;
-  isCertified: number; // -1, 1, 0 (reject, valid, pending)
+  isCertified: BN; // -1, 1, 0 (reject, valid, pending)
   isPublic: boolean;
 }
 
@@ -92,5 +97,13 @@ export default class MemberCertificationContract {
 
   public getApplications(indexList: number[]): Promise<CertificationResponse[]> {
     return Promise.all(indexList.map(number => this.getApplication(number)));
+  }
+
+  public AddCertification(object: any): EventEmitter {
+  return this.contract.events.AddCertification((object));
+  }
+
+  public ApplicationStatusChange(object: any): EventEmitter {
+    return this.contract.events.ApplicationStatusChange(object);
   }
 }

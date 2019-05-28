@@ -1,8 +1,9 @@
 import React from 'react';
-import MemberCertificationContract from '../modules/library';
-import { Account, storeFakeAccounts, getAccounts } from '../modules/helper';
+import User from '../modules/user';
+import { Account, storeFakeAccounts, getAccounts, setCurrentEthAddress } from '../modules/helper';
 import { Segment, Loader, Container, Header, Icon } from 'semantic-ui-react';
 import Page from '../components/page';
+import Router from 'next/router';
 
 interface IndexState {
   accounts: Account[];
@@ -24,11 +25,12 @@ class Index extends React.Component<{}, IndexState> {
       accounts: [],
       loading: true,
     };
+    this.onClick = this.onClick.bind(this);
   }
 
   public componentDidMount() {
     const customWindow = window as any;
-    customWindow['MemberCertificationContract'] = MemberCertificationContract;
+    customWindow['User'] = User;
     storeFakeAccounts();
     const accounts = getAccounts();
     if (accounts)
@@ -38,11 +40,19 @@ class Index extends React.Component<{}, IndexState> {
     });
   }
 
+  public onClick(ethAddress: string) {
+    setCurrentEthAddress(ethAddress);
+    Router.push('/home');
+  }
+
   public getAccountList() {
-    return this.state.accounts.map(account => <Segment color='teal'>
+    return this.state.accounts.map(account => <Segment 
+    className='login-segment'
+    color='teal'
+    onClick={ () => { this.onClick(account.ethAddress); }}
+    >
       <h3>{ account.ethAddress }</h3>
       <p>{ account.name }</p>
-      <Icon name='chevron right' />
     </Segment>)
   }
 

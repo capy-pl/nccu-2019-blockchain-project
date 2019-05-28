@@ -26,3 +26,13 @@ export function getAccounts(): Account[] | undefined {
     return accounts;
   }
 }
+
+const GLOBAL: any = {};
+
+export function setCurrentEthAddress(ethAddress: string) {
+  GLOBAL.ethAddress = ethAddress;
+}
+
+export function getCurrentEthAddress(): string | undefined {
+  return GLOBAL.ethAddress;
+}

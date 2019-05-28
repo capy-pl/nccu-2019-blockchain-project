@@ -28,6 +28,17 @@ contract MemberCertification {
         bool isPublic;
     }
 
+    event AddCertification (
+        string orgName,
+        uint index
+    );
+
+    event ApplicationStatusChange (
+        address ethAddress,
+        uint applicationIndex,
+        uint status
+    );
+
     mapping (address => uint) private memberList;
     mapping (uint => uint) private certificationOwner;
     mapping (string => uint) public searchOrgByName;
@@ -77,12 +88,12 @@ contract MemberCertification {
         require(isExist == true, 'Cannot not found the member.');
         _;
     }
-    
+
     modifier certificationExist(uint index) {
         require(certifications.length > index, 'Certifcation index out of range');
         _;
     }
-    
+
     modifier controlledByOrg(string memory orgName, uint index) {
         bool belongsToOrg = false;
         Organization memory organization = getOrgViewByName(orgName);
@@ -141,6 +152,7 @@ contract MemberCertification {
         certificationOwner[certifications.length] = memberList[msg.sender];
         organizations[targetOrg].applicationCount += 1;
         certifications.push(certification);
+        emit AddCertification(orgName, certifications.length - 1);
     }
 
     function addAdmin(string memory orgName, address admin)
@@ -194,7 +206,7 @@ contract MemberCertification {
         Organization memory organization = getOrgViewByName(orgName);
         return organization.certificateApplications;
     }
-    
+
     function getApplication(uint certificationIndex)
     public
     view
@@ -234,5 +246,6 @@ contract MemberCertification {
         Organization storage organization = organizations[searchOrgByName[orgName]];
         Certification storage certification = certifications[organization.certificateApplications[applicationIndex]];
         certification.isCertified = 1;
+        emit ApplicationStatusChange(members[certificationOwner[applicationIndex]].ethAddress, applicationIndex, 1);
     }
 }
