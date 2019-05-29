@@ -13,6 +13,13 @@ const ACCOUNTS: Account[] = [
     ethAddress: '0x486289044624a9c1A202cB84Ed1FCfA56aD1E610'
   }
 ];
+export const ORGANIZATIONS = [
+  {
+    key: 'NCCU',
+    value: 'NCCU',
+    text: 'NCCU'
+  }
+];
 
 export function storeFakeAccounts(): void {
   const accounts = JSON.stringify(ACCOUNTS);

@@ -5,7 +5,7 @@ import { EventEmitter } from 'events';
 
 const httpProvider = 'http://127.0.0.1:8545';
 const web3 = new Web3(httpProvider);
-const contractAddress = '0x81F35D829107aA40Fc4ba62361db20D4c8d7382A';
+const contractAddress = '0x3f69d9BA868Fe63CFBb7D1Cfa554F808e7A49fAE';
 
 export function initContract(contractAddress: string, abi: any) {
   const { Contract } = web3.eth;
@@ -28,15 +28,15 @@ interface UserInfo {
 export interface Certification {
   title: string;
   value: string;
-  validFrom: Date;
-  validUntil: Date;
-  organization: number;
+  validFrom: number;
+  validUntil: number;
+  organization: string;
   isCertified: BN; // -1, 1, 0 (reject, valid, pending)
   isPublic: boolean;
 }
 
 export interface CertificationResponse extends Certification {
-  applicationIndex: number;
+  applicationIndex: BN;
   name: string;
   orgName: string;
 }
@@ -65,9 +65,19 @@ export default class MemberCertificationContract {
     });
   }
 
-  public addCertification(title: string, value: string, validFrom: Date, validTo: Date, isPublic: boolean, orgName: string): Promise<void> {
-    return this.contract.methods.addCertification(title, value, validFrom, validTo, isPublic, orgName).send({
-      from: this.from
+  public addCertification(title: string, value: string, validFrom: number, validTo: number, isPublic: boolean, orgName: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.contract.methods.addCertification(title, value, validFrom, validTo, isPublic, orgName).send({
+        from: this.from,
+        gas: 85000000,
+        gasPrice: 1
+      }, function(err: boolean, receipt: any) {
+        if (err) {
+          reject();
+        } else {
+          resolve(receipt);
+        }
+      }); 
     });
   }
 
@@ -90,9 +100,19 @@ export default class MemberCertificationContract {
   }
 
   public verifyApplication(orgName: string, applicationIndex: string) {
-    return this.contract.methods.verifyApplication(orgName, applicationIndex).send({
-      from: this.from
-    });
+    return new Promise((resolve, reject) => {
+      return this.contract.methods.verifyApplication(orgName, applicationIndex).send({
+        from: this.from,
+        gas: 85000000,
+        gasPrice: 1
+      }, function(err: boolean, receipt: any) {
+        if (err) {
+          reject();
+        } else {
+          resolve(receipt);
+        }
+      });
+    })
   }
 
   public getApplications(indexList: number[]): Promise<CertificationResponse[]> {

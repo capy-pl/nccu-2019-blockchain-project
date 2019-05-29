@@ -1,24 +1,33 @@
 import MemberCertificationContract, { CertificationResponse } from './library';
-import { EventEmitter } from 'events';
 
 export default class User {
   public contract: MemberCertificationContract;
-  public name?: string;
-  public id?: string;
-  public ethAddress?: string;
-  public isPublic?: boolean;
-  public orgNameIfAdmin?: string;
-  public isAdmin?: boolean;
-  public certificationList?: CertificationResponse[];
-  public orgApplicationList?: CertificationResponse[];
+  public name: string;
+  public id: string;
+  public ethAddress: string;
+  public isPublic: boolean;
+  public orgNameIfAdmin: string;
+  public isAdmin: boolean;
+  public certificationList: CertificationResponse[];
+  public orgApplicationList: CertificationResponse[];
   // public addCertificationListener?: EventEmitter;
   // public applicationStatusChangeListener?: EventEmitter;
 
   constructor(address: string) {
     this.contract = new MemberCertificationContract(address);
+    this.name = '';
+    this.id = '';
+    this.ethAddress = '';
+    this.orgNameIfAdmin = '';
+    this.isPublic = false;
+    this.isAdmin = false;
+    this.certificationList = [];
+    this.orgApplicationList = [];
   }
 
   public async load(): Promise<void> {
+    const test = await this.contract.getInfo();
+    console.log(test);
     const {
       name,
       id,
@@ -26,7 +35,7 @@ export default class User {
       certificationList,
       isPublic,
       orgNameIfAdmin
-    } = await this.contract.getInfo();
+    } = test;
     this.name = name;
     this.id = id;
     this.ethAddress = ethAddress;
