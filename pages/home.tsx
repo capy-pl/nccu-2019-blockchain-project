@@ -64,7 +64,11 @@ class Home extends React.Component<{}, HomeInterface> {
 
   public getCertificationItemList() {
     if (this.state.user) {
-      return this.state.user.certificationList.map(certification => <CertificationItem key={certification.applicationIndex.toNumber()} certification={certification} />)
+      if (this.state.activeItem == 'home') {
+        return this.state.user.certificationList.map(certification => <CertificationItem key={certification.applicationIndex.toNumber()} certification={certification} />)
+      }
+      if (this.state.activeItem == 'orgApp')
+        return this.state.user.orgApplicationList.map(certification => <CertificationItem key={certification.applicationIndex.toNumber()} certification={certification} />)
     } else {
       return;
     }
@@ -83,8 +87,14 @@ class Home extends React.Component<{}, HomeInterface> {
       );
     }
     const certificationList = this.getCertificationItemList();
+
     return (<Page>
-      <Navbar onClick={this.onClick} name={this.state.user.name} activeItem={this.state.activeItem}/>
+      <Navbar
+        onClick={this.onClick}
+        name={this.state.user.name}
+        activeItem={this.state.activeItem}
+        isAdmin={this.state.user.isAdmin}
+      />
       <Segment>
         <AddCertificationModal onSubmit={this.onSubmit} />
         { certificationList }

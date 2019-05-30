@@ -43,3 +43,7 @@ export function setCurrentEthAddress(ethAddress: string) {
 export function getCurrentEthAddress(): string | undefined {
   return GLOBAL.ethAddress;
 }
+
+export function clearCurrentEthAddress(): void {
+  delete GLOBAL.ethAddress;
+}

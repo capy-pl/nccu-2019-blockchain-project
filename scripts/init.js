@@ -3,7 +3,7 @@ const Contract = require('../build/contracts/MemberCertification.json');
 const httpProvider = 'http://127.0.0.1:8545';
 const web3 = new Web3(httpProvider);
 
-const contractAddress = '0x3f69d9BA868Fe63CFBb7D1Cfa554F808e7A49fAE';
+const contractAddress = '0x81F35D829107aA40Fc4ba62361db20D4c8d7382A';
 const ownerAddress = '0x20305d11E6C5290f629654D54E71F53142D06f15';
 
 const ACCOUNTS = [{
@@ -68,44 +68,17 @@ function addCertification(title, value, validFrom, validUntil, isPublic, orgName
   })
 }
 // Add person
-const addMembers = Promise.all(ACCOUNTS.map(account => {
-  return MemberCertification.methods.addMember(account.name, account.id, account.ethAddress, true)
-    .send({
-      from: ownerAddress,
-      gas: 85000000,
-      gasPrice: 1
-    });
-}));
+Promise.all(ACCOUNTS.map(account => {
+  return addMember(account.name, account.id, account.ethAddress, true)
+}))
+.then(result => {
+  console.log(`${result.length} members were added.`);
+return addOrganization('NCCU', ACCOUNTS[0].ethAddress);
+})
+.then(result => {
+  console.log('1 organization was added.');
+})
+.catch(err => {
+  console.error(err);
+})
 
-const addOrganization = MemberCertification.methods.addOrg('NCCU', ACCOUNTS[0].ethAddress);
-
-addMembers
-  .then(results => {
-    console.log(`${results.length} members were added.`);
-    return addOrganization.send({
-      from: ownerAddress,
-      gas: 85000000
-    });
-  })
-  .then(result => {
-    console.log('1 Organization was added.');
-    return MemberCertification.methods.addCertification('Accounting Department', 'Graduated', Date.now(), Date.now(), true, 'NCCU')
-    .send({
-      from: ACCOUNTS[1].ethAddress,
-      gas: 85000000
-    });
-  })
-  .then(result => {
-    console.log('Certification1 added.');
-    return MemberCertification.methods.addCertification('MIS Department', 'Graduated', Date.now(), Date.now(), true, 'NCCU')
-    .send({
-      from: ACCOUNTS[1].ethAddress,
-      gas: 85000000
-    });
-  })
-  .then(() => {
-    console.log('Certification2 added.');
-  })
-  .catch(err => {
-    console.error(err);
-  })

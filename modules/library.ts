@@ -5,7 +5,7 @@ import { EventEmitter } from 'events';
 
 const httpProvider = 'http://127.0.0.1:8545';
 const web3 = new Web3(httpProvider);
-const contractAddress = '0x3f69d9BA868Fe63CFBb7D1Cfa554F808e7A49fAE';
+const contractAddress = '0x81F35D829107aA40Fc4ba62361db20D4c8d7382A';
 
 export function initContract(contractAddress: string, abi: any) {
   const { Contract } = web3.eth;
