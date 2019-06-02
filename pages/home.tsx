@@ -11,8 +11,9 @@ import {
 import Page from '../components/page';
 import Navbar from '../components/navbar';
 import CertificationItem from '../components/certificationItem';
-import AddCertificationModal from '../components/addCertificationModal';
-import { Certification } from '../modules/library';
+import OrgCertificaionItem from '../components/orgCertificationItem';
+import AddCertificationModal from '../components/modal/addCertificationModal';
+import { Certification, BN } from '../modules/library';
 
 interface HomeInterface {
   activeItem: string;
@@ -30,6 +31,7 @@ class Home extends React.Component<{}, HomeInterface> {
     };
     this.onClick = this.onClick.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.onOrgSubmit = this.onOrgSubmit.bind(this);
   }
 
   public async componentDidMount() {
@@ -62,13 +64,32 @@ class Home extends React.Component<{}, HomeInterface> {
     }
   }
 
+  public async onOrgSubmit(mode: 'verify' | 'reject', index: BN, orgName: string): Promise<void> {
+    if (this.state.user) {
+      if (mode === 'verify') {
+        await this.state.user.contract.verifyApplication(orgName, index.toNumber());
+      } else {
+        await this.state.user.contract.rejectApplication(orgName, index.toNumber());
+      }
+      await this.state.user.load();
+      this.forceUpdate();
+    }
+  }
+
   public getCertificationItemList() {
     if (this.state.user) {
       if (this.state.activeItem == 'home') {
-        return this.state.user.certificationList.map(certification => <CertificationItem key={certification.applicationIndex.toNumber()} certification={certification} />)
+        return this.state.user.certificationList.map(certification => <CertificationItem
+          key={certification.applicationIndex.toNumber()}
+          certification={certification}
+          />)
       }
       if (this.state.activeItem == 'orgApp')
-        return this.state.user.orgApplicationList.map(certification => <CertificationItem key={certification.applicationIndex.toNumber()} certification={certification} />)
+        return this.state.user.orgApplicationList.map(certification => <OrgCertificaionItem
+          key={certification.applicationIndex.toNumber()}
+          certification={certification} 
+          onOrgSubmit={this.onOrgSubmit}
+          />);
     } else {
       return;
     }
@@ -96,7 +117,11 @@ class Home extends React.Component<{}, HomeInterface> {
         isAdmin={this.state.user.isAdmin}
       />
       <Segment>
-        <AddCertificationModal onSubmit={this.onSubmit} />
+        {
+          this.state.activeItem == 'home' ? 
+            <AddCertificationModal onSubmit={this.onSubmit} />
+          : ''
+        }
         { certificationList }
       </Segment>
     </Page>);

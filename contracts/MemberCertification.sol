@@ -36,7 +36,7 @@ contract MemberCertification {
     event ApplicationStatusChange (
         address ethAddress,
         uint applicationIndex,
-        uint status
+        int status
     );
 
     mapping (address => uint) private memberList;
@@ -243,9 +243,19 @@ contract MemberCertification {
     isOrgAdmin(orgName)
     controlledByOrg(orgName, applicationIndex)
     {
-        Organization storage organization = organizations[searchOrgByName[orgName]];
-        Certification storage certification = certifications[organization.certificateApplications[applicationIndex]];
+        Certification storage certification = certifications[applicationIndex];
         certification.isCertified = 1;
         emit ApplicationStatusChange(members[certificationOwner[applicationIndex]].ethAddress, applicationIndex, 1);
+    }
+
+    function rejectApplication(string memory orgName, uint applicationIndex)
+    public
+    orgExist(orgName)
+    isOrgAdmin(orgName)
+    controlledByOrg(orgName, applicationIndex)
+    {
+        Certification storage certification = certifications[applicationIndex];
+        certification.isCertified = -1;
+        emit ApplicationStatusChange(members[certificationOwner[applicationIndex]].ethAddress, applicationIndex, -1);
     }
 }

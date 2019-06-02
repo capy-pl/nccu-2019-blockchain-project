@@ -11,6 +11,10 @@ const ACCOUNTS: Account[] = [
   {
     name: 'Philip Lin',
     ethAddress: '0x486289044624a9c1A202cB84Ed1FCfA56aD1E610'
+  },
+  {
+    name: 'Karen Ho',
+    ethAddress: '0x3ed707Bb53D526c470B85cF9A19fCDB7DA5df55d'
   }
 ];
 export const ORGANIZATIONS = [
@@ -18,6 +22,11 @@ export const ORGANIZATIONS = [
     key: 'NCCU',
     value: 'NCCU',
     text: 'NCCU'
+  },
+  {
+    key: 'TOEFL',
+    value: 'TOEFL',
+    text: 'TOEFL'
   }
 ];
 

@@ -5,7 +5,7 @@ import {
   Modal,
   Message
 } from 'semantic-ui-react';
-import { ORGANIZATIONS } from '../modules/helper';
+import { ORGANIZATIONS } from '../../modules/helper';
 
 interface AddCertificationModalState {
   title: string;
@@ -86,10 +86,10 @@ export default class AddCertificationModal extends React.Component<AddCertificat
             this.clear();
             this.setState({
               open: false,
+              loading: false,
             });
           })
           .catch(err => {
-            console.log(err);
             this.setState({
               loading: false,
               error: true
@@ -108,7 +108,6 @@ export default class AddCertificationModal extends React.Component<AddCertificat
       <Modal
       open={this.state.open}
       centered={false}
-      closeIcon
       >
         <Modal.Header>Add New Certification</Modal.Header>
         <Modal.Content>

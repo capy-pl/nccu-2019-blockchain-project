@@ -27,7 +27,6 @@ export default class User {
 
   public async load(): Promise<void> {
     const test = await this.contract.getInfo();
-    console.log(test);
     const {
       name,
       id,
@@ -61,7 +60,7 @@ export default class User {
     await this.loadCertifcations(certificationList);
   }
   
-  public async loadOrgApplications(orgName: string): Promise<CertificationResponse[]> {
+  public async loadOrgApplications(orgName: string): Promise<void> {
     const indexList = await this.contract.getOrgApplicationIndexList(orgName);
     this.orgApplicationList = await this.loadCertifcations(indexList);
     this.orgApplicationList = this.orgApplicationList.filter(certification => {
@@ -70,7 +69,7 @@ export default class User {
       }
       return false;
     });
-    return this.orgApplicationList;
+    console.log(this.orgApplicationList);
   }
 
   public async loadCertifcations(certificationList: number[]): Promise<CertificationResponse[]> {

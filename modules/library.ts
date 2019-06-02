@@ -5,14 +5,14 @@ import { EventEmitter } from 'events';
 
 const httpProvider = 'http://127.0.0.1:8545';
 const web3 = new Web3(httpProvider);
-const contractAddress = '0x81F35D829107aA40Fc4ba62361db20D4c8d7382A';
+const contractAddress = '0x6eA75A4913352D84C7df281964472F7e64729807';
 
 export function initContract(contractAddress: string, abi: any) {
   const { Contract } = web3.eth;
   return new Contract(abi, contractAddress);
 }
 
-interface BN {
+export interface BN {
   toNumber: () => number;
 }
 
@@ -28,8 +28,8 @@ interface UserInfo {
 export interface Certification {
   title: string;
   value: string;
-  validFrom: number;
-  validUntil: number;
+  validFrom: BN;
+  validUntil: BN;
   organization: string;
   isCertified: BN; // -1, 1, 0 (reject, valid, pending)
   isPublic: boolean;
@@ -99,13 +99,29 @@ export default class MemberCertificationContract {
     });
   }
 
-  public verifyApplication(orgName: string, applicationIndex: string) {
+  public verifyApplication(orgName: string, applicationIndex: number) {
     return new Promise((resolve, reject) => {
       return this.contract.methods.verifyApplication(orgName, applicationIndex).send({
         from: this.from,
         gas: 85000000,
         gasPrice: 1
       }, function(err: boolean, receipt: any) {
+        if (err) {
+          reject();
+        } else {
+          resolve(receipt);
+        }
+      });
+    })
+  }
+
+  public rejectApplication(orgName: string, applicationIndex: number) {
+    return new Promise((resolve, reject) => {
+      return this.contract.methods.rejectApplication(orgName, applicationIndex).send({
+        from: this.from,
+        gas: 85000000,
+        gasPrice: 1
+      }, function (err: boolean, receipt: any) {
         if (err) {
           reject();
         } else {
