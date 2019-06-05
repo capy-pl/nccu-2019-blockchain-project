@@ -1,5 +1,9 @@
 import React from 'react';
-import { Button, Grid, Segment, List, Icon, Item } from 'semantic-ui-react'
+import {
+  Grid,
+  Segment,
+  List 
+} from 'semantic-ui-react'
 import {
   CheckIcon,
   RejectIcon,

@@ -1,6 +1,13 @@
 import React, { Component } from 'react'
-import { Button, Header, Icon, Modal } from 'semantic-ui-react'
-import { BN, CertificationResponse } from '../../modules/library';
+import {
+  Button,
+  Icon,
+  Modal
+} from 'semantic-ui-react'
+import {
+  BN,
+  CertificationResponse
+} from '../../modules/library';
 
 interface verifyCertificationModalState {
   open: boolean;

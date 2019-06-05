@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Grid, Segment } from 'semantic-ui-react'
+import { Grid, Segment } from 'semantic-ui-react'
 import { CertificationResponse } from '../modules/library';
 import VerifyCertificationModal from '../components/modal/veritfyCertificationModal';
 import { BN } from '../modules/library';
