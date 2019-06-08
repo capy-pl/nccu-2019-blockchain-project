@@ -5,7 +5,7 @@ import { EventEmitter } from 'events';
 
 const httpProvider = 'http://127.0.0.1:8545';
 const web3 = new Web3(httpProvider);
-const contractAddress = '0x6eA75A4913352D84C7df281964472F7e64729807';
+const contractAddress = '0x10b8C1E01146505e8b06e0ecf9F1973B7E8F59d8';
 
 export function initContract(contractAddress: string, abi: any) {
   const { Contract } = web3.eth;
@@ -23,6 +23,11 @@ interface UserInfo {
   certificationList: number[];
   isPublic: boolean;
   orgNameIfAdmin: string;
+}
+
+export interface UserBriefInfo {
+  name: string;
+  id: string;
 }
 
 export interface Certification {
@@ -99,7 +104,7 @@ export default class MemberCertificationContract {
     });
   }
 
-  public verifyApplication(orgName: string, applicationIndex: number) {
+  public verifyApplication(orgName: string, applicationIndex: number): Promise<any> {
     return new Promise((resolve, reject) => {
       return this.contract.methods.verifyApplication(orgName, applicationIndex).send({
         from: this.from,
@@ -115,7 +120,7 @@ export default class MemberCertificationContract {
     })
   }
 
-  public rejectApplication(orgName: string, applicationIndex: number) {
+  public rejectApplication(orgName: string, applicationIndex: number): Promise<any> {
     return new Promise((resolve, reject) => {
       return this.contract.methods.rejectApplication(orgName, applicationIndex).send({
         from: this.from,
@@ -135,11 +140,49 @@ export default class MemberCertificationContract {
     return Promise.all(indexList.map(number => this.getApplication(number)));
   }
 
-  public AddCertification(object: any): EventEmitter {
-  return this.contract.events.AddCertification((object));
+  public issueCertification(id: string, title: string, value: string, validFrom: number, validTo: number, isPublic: boolean, orgName: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      return this.contract.methods.issueCertification(id, title, value, validFrom, validTo, isPublic, orgName)
+        .send({
+          from: this.from,
+          gas: 85000000,
+          gasPrice: 1
+        }, function(err: boolean, receipt: any) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(receipt);
+          }
+        })
+    })
   }
 
-  public ApplicationStatusChange(object: any): EventEmitter {
-    return this.contract.events.ApplicationStatusChange(object);
+  public getMemberLength(): Promise<BN> {
+    return this.contract.methods.getMemberLength().call({
+      from: this.from
+    });
   }
+
+  public getMemberNameAndId(index: number): Promise<UserBriefInfo> {
+    return this.contract.methods.getMemberNameAndId(index).call({
+      from: this.from
+    });
+  }
+
+  public async getMembers(): Promise<UserBriefInfo[]> {
+    const len = await this.getMemberLength();
+    const members = [];
+    for (let i = 0; i < len.toNumber(); i++) {
+      members.push(this.getMemberNameAndId(i));
+    }
+    return await Promise.all(members);
+  }
+
+  // public AddCertification(object: any): EventEmitter {
+  //   return this.contract.events.AddCertification((object));
+  // }
+
+  // public ApplicationStatusChange(object: any): EventEmitter {
+  //   return this.contract.events.ApplicationStatusChange(object);
+  // }
 }

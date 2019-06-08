@@ -15,8 +15,13 @@ const ACCOUNTS: Account[] = [
   {
     name: 'Karen Ho',
     ethAddress: '0x3ed707Bb53D526c470B85cF9A19fCDB7DA5df55d'
+  },
+  {
+    name: 'Leo Kuo',
+    ethAddress: '0x4922E14FeEd3e03ac7FAb84d483a78f99E13ae5d'
   }
 ];
+
 export const ORGANIZATIONS = [
   {
     key: 'NCCU',

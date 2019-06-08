@@ -3,7 +3,7 @@ const Contract = require('../build/contracts/MemberCertification.json');
 const httpProvider = 'http://127.0.0.1:8545';
 const web3 = new Web3(httpProvider);
 
-const contractAddress = '0x6eA75A4913352D84C7df281964472F7e64729807';
+const contractAddress = '0x10b8C1E01146505e8b06e0ecf9F1973B7E8F59d8';
 const ownerAddress = '0x20305d11E6C5290f629654D54E71F53142D06f15';
 
 const ACCOUNTS = [{
@@ -20,6 +20,11 @@ const ACCOUNTS = [{
     name: 'Karen Ho',
     id: 'O123789456',
     ethAddress: '0x3ed707Bb53D526c470B85cF9A19fCDB7DA5df55d'
+  },
+  {
+    name: 'Leo Kuo',
+    id: 'K123666444',
+    ethAddress: '0x4922E14FeEd3e03ac7FAb84d483a78f99E13ae5d'
   }
 ];
 
@@ -87,8 +92,13 @@ Promise.all(ACCOUNTS.map(account => {
 })
 .then(result => {
   console.log('TOEFL was added.');
+  return addOrganization('Google', ACCOUNTS[3].ethAddress);
+})
+.then(result => {
+  console.log('Google was added.');
   console.log('Init process successfully ended.');
 })
+
 .catch(err => {
   console.error(err);
 })

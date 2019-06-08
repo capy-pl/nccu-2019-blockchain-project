@@ -139,18 +139,44 @@ contract MemberCertification {
         members.push(member);
     }
 
+    function compareStrings (string memory a, string memory b)
+    public
+    pure
+    returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))) );
+   }
+
     function addCertification(string memory title, string memory value, uint validFrom, uint validUntil, bool isPublic, string memory orgName)
     public
     orgExist(orgName)
     memberAddressExist(msg.sender)
     {
         uint targetOrg = searchOrgByName[orgName];
-        Certification memory certification = Certification(title, value, validFrom, validUntil, orgName, 0, isPublic);
+        int status = 0;
+        Certification memory certification = Certification(title, value, validFrom, validUntil, orgName, status, isPublic);
         Member storage member = members[memberList[msg.sender]];
         organizations[targetOrg].certificateApplications.push(certifications.length);
         member.certifications.push(certifications.length);
         certificationOwner[certifications.length] = memberList[msg.sender];
         organizations[targetOrg].applicationCount += 1;
+        certifications.push(certification);
+        emit AddCertification(orgName, certifications.length - 1);
+    }
+
+    function issueCertification(string memory id,
+    string memory title,
+    string memory value,
+    uint validFrom,
+    uint validUntil,
+    bool isPublic,
+    string memory orgName)
+    public
+    isOrgAdmin(orgName)
+    {
+        Certification memory certification = Certification(title, value, validFrom, validUntil, orgName, 1, isPublic);
+        Member storage member = members[searchMemberById[id]];
+        member.certifications.push(certifications.length);
+        certificationOwner[certifications.length] = searchMemberById[id];
         certifications.push(certification);
         emit AddCertification(orgName, certifications.length - 1);
     }
@@ -179,6 +205,28 @@ contract MemberCertification {
         return organizations[searchOrgByName[orgName]];
     }
 
+    function getMemberLength()
+    public
+    view
+    returns (
+    uint length
+    )
+    {
+        return members.length;
+    }
+
+    function getMemberNameAndId(uint index)
+    public
+    view
+    returns (
+    string memory name,
+    string memory id
+    )
+    {
+        Member memory member = members[index];
+        return (member.name, member.id);
+    }
+    
     function getInfo ()
     public
     view

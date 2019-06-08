@@ -13,6 +13,8 @@ import Navbar from '../components/navbar';
 import CertificationItem from '../components/certificationItem';
 import OrgCertificaionItem from '../components/orgCertificationItem';
 import AddCertificationModal from '../components/modal/addCertificationModal';
+import IssueCertificationModal, { IssueCertificationModalState } from '../components/modal/issueCertificationModal';
+
 import { Certification, BN } from '../modules/library';
 
 interface HomeInterface {
@@ -30,8 +32,9 @@ class Home extends React.Component<{}, HomeInterface> {
       user: undefined
     };
     this.onClick = this.onClick.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+    this.addCertificate = this.addCertificate.bind(this);
     this.onOrgSubmit = this.onOrgSubmit.bind(this);
+    this.issueCertificate = this.issueCertificate.bind(this);
   }
 
   public async componentDidMount() {
@@ -52,7 +55,7 @@ class Home extends React.Component<{}, HomeInterface> {
     });
   }
   
-  public async onSubmit(certification: Certification): Promise<void> {
+  public async addCertificate(certification: Certification): Promise<void> {
     if (this.state.user) {
       try {
         await this.state.user.contract.addCertification(certification.title, certification.value, certification.validFrom, certification.validTo, true, certification.orgName);
@@ -60,6 +63,18 @@ class Home extends React.Component<{}, HomeInterface> {
         this.forceUpdate();
       } catch(err) {
         console.error(err);
+      }
+    }
+  }
+
+  public async issueCertificate(data: IssueCertificationModalState): Promise<void> {
+    if (this.state.user) {
+      try {
+          await this.state.user.contract.issueCertification(data.id, data.title, data.value, data.validFrom, data.validTo, true, this.state.user.orgNameIfAdmin);
+          await this.state.user.load();
+          this.forceUpdate();
+      } catch(err) {
+        console.log(err);
       }
     }
   }
@@ -119,8 +134,8 @@ class Home extends React.Component<{}, HomeInterface> {
       <Segment>
         {
           this.state.activeItem == 'home' ? 
-            <AddCertificationModal onSubmit={this.onSubmit} />
-          : ''
+            <AddCertificationModal onSubmit={this.addCertificate} />
+            : <IssueCertificationModal members={this.state.user.memberList} onSubmit={this.issueCertificate} />
         }
         { certificationList }
       </Segment>

@@ -1,4 +1,4 @@
-import MemberCertificationContract, { CertificationResponse } from './library';
+import MemberCertificationContract, { CertificationResponse, UserBriefInfo } from './library';
 
 export default class User {
   public contract: MemberCertificationContract;
@@ -10,6 +10,7 @@ export default class User {
   public isAdmin: boolean;
   public certificationList: CertificationResponse[];
   public orgApplicationList: CertificationResponse[];
+  public memberList: UserBriefInfo[];
   // public addCertificationListener?: EventEmitter;
   // public applicationStatusChangeListener?: EventEmitter;
 
@@ -23,6 +24,7 @@ export default class User {
     this.isAdmin = false;
     this.certificationList = [];
     this.orgApplicationList = [];
+    this.memberList = [];
   }
 
   public async load(): Promise<void> {
@@ -39,20 +41,11 @@ export default class User {
     this.id = id;
     this.ethAddress = ethAddress;
     this.isPublic = isPublic;
-    // this.applicationStatusChangeListener = this.contract.ApplicationStatusChange({
-    //   filter: {
-    //     ethAddress,
-    //   }
-    // });
     if (orgNameIfAdmin && orgNameIfAdmin.length) {
       this.orgNameIfAdmin = orgNameIfAdmin;
       this.isAdmin = true;
       await this.loadOrgApplications(orgNameIfAdmin);
-      // this.addCertificationListener = this.contract.AddCertification({
-      //   filter: {
-      //     orgName: orgNameIfAdmin
-      //   }
-      // });
+      await this.loadMembers();
     } else {
       this.orgNameIfAdmin = '';
       this.isAdmin = false;
@@ -69,12 +62,15 @@ export default class User {
       }
       return false;
     });
-    console.log(this.orgApplicationList);
   }
 
   public async loadCertifcations(certificationList: number[]): Promise<CertificationResponse[]> {
     const list = await this.contract.getApplications(certificationList);
     this.certificationList = list;
     return list;
+  }
+
+  public async loadMembers(): Promise<void> {
+    this.memberList = await this.contract.getMembers();
   }
 }
